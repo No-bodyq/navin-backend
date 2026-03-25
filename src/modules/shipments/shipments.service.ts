@@ -3,12 +3,11 @@ import type { FilterQuery } from 'mongoose';
 import { tokenizeShipment } from '../../services/stellar.service.js';
 import { mockUploadToStorage } from '../../services/mockStorageService.js';
 
-export const findShipments = async (query: FilterQuery<unknown>, skip: number, limit: number) => {
-  return Shipment.find(query).skip(skip).limit(limit);
-};
-
-export const countShipments = async (query: FilterQuery<unknown>) => {
-  return Shipment.countDocuments(query);
+export const findShipments = async (query: FilterQuery<unknown>, limit: number) => {
+  return Shipment.find(query)
+    .sort({ createdAt: -1, _id: -1 })
+    .limit(limit + 1)
+    .lean();
 };
 
 export const createShipmentService = async (data: { trackingNumber: string; origin: string; destination: string; [key: string]: unknown }) => {

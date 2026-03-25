@@ -13,4 +13,8 @@ const AnomalySchema = new Schema(
   { timestamps: true },
 );
 
+AnomalySchema.index({ shipmentId: 1, createdAt: -1 });
+AnomalySchema.index({ severity: 1, createdAt: -1 });
+AnomalySchema.index({ createdAt: -1, _id: -1 });
+
 export const Anomaly = model('Anomaly', AnomalySchema);
