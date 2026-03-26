@@ -74,6 +74,11 @@ describe('Real-time Socket.io Events', () => {
       Telemetry: {
         create: mockTelemetryCreate,
       },
+      TelemetryAnchorStatus: {
+        PENDING_ANCHOR: 'PENDING_ANCHOR',
+        ANCHORED: 'ANCHORED',
+        ANCHOR_FAILED: 'ANCHOR_FAILED',
+      },
     }));
 
     await jest.unstable_mockModule('../src/services/stellar.service.js', () => ({
@@ -86,6 +91,13 @@ describe('Real-time Socket.io Events', () => {
       generateApiKey: jest.fn(),
       revokeApiKey: jest.fn(),
       listApiKeys: jest.fn(),
+    }));
+
+    await jest.unstable_mockModule('../src/infra/redis/queue.js', () => ({
+      pushAlertJob: jest.fn(),
+      pushStellarAnchorJob: jest.fn(),
+      getTransactionQueue: jest.fn(),
+      getRedisClient: jest.fn(),
     }));
 
     await jest.unstable_mockModule('../src/infra/socket/io.js', () => ({
@@ -139,7 +151,7 @@ describe('Real-time Socket.io Events', () => {
         .set('x-api-key', 'valid-api-key')
         .send(body);
 
-      expect(res.status).toBe(201);
+      expect(res.status).toBe(202);
       expect(mockEmitTelemetryUpdate).toHaveBeenCalledTimes(1);
       expect(mockEmitTelemetryUpdate).toHaveBeenCalledWith(
         body.shipmentId,
