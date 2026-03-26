@@ -1,12 +1,16 @@
 import { Server as HttpServer } from 'http';
 import { Server } from 'socket.io';
 
+import { socketAuth } from '../../shared/middleware/socketAuth.js';
+
 let io: Server | null = null;
 
 export function initSocketIO(httpServer: HttpServer): Server {
   io = new Server(httpServer, {
     cors: { origin: '*' },
   });
+
+  
 
   io.on('connection', socket => {
     socket.on('join_shipment', (shipmentId: string) => {
