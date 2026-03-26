@@ -4,7 +4,7 @@ import { generateDataHash } from '../../shared/utils/crypto.js';
 import { anchorTelemetryHash } from '../../services/stellar.service.js';
 import { createTelemetryRecord } from '../telemetry/telemetry.service.js';
 import { detectAnomaly } from '../anomaly/anomaly.service.js';
-import { emitAnomalyDetected } from '../../infra/socket/io.js';
+import { emitAnomalyDetected, emitTelemetryUpdate } from '../../infra/socket/io.js';
 import { pushAlertJob } from '../../infra/redis/queue.js';
 import type { IotWebhookBody } from './iot.validation.js';
 
@@ -29,6 +29,9 @@ export const iotWebhookController: RequestHandler = async (req, res) => {
     stellarTxHash,
     rawPayload: body,
   });
+
+  // Emit telemetry update to the shipment room
+  emitTelemetryUpdate(body.shipmentId, telemetry);
 
   res.status(201).json({ data: telemetry });
 

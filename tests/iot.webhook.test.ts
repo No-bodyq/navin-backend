@@ -80,6 +80,16 @@ describe('POST /api/webhooks/iot', () => {
       };
     });
 
+    await jest.unstable_mockModule('../src/infra/socket/io.js', () => {
+      return {
+        initSocketIO: jest.fn(),
+        getIO: jest.fn(),
+        emitAnomalyDetected: jest.fn(),
+        emitTelemetryUpdate: jest.fn(),
+        emitStatusUpdate: jest.fn(),
+      };
+    });
+
     const appModule = await import('../src/app.js');
     app = appModule.buildApp();
   });
