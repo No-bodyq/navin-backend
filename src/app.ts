@@ -4,6 +4,7 @@ import cors from 'cors';
 import { requestId } from './shared/middleware/requestId.js';
 import { notFound } from './shared/middleware/notFound.js';
 import { errorMiddleware } from './shared/http/errorMiddleware.js';
+import { standardLimiter, strictLimiter } from './shared/middleware/rateLimiter.js';
 
 import { healthRouter } from './modules/health/health.routes.js';
 import { usersRouter } from './modules/users/users.routes.js';
@@ -18,6 +19,9 @@ export function buildApp() {
   app.use(requestId());
   app.use(cors());
   app.use(express.json());
+
+  app.use(standardLimiter);
+  app.use('/api/auth/login', strictLimiter);
 
   app.use('/api/health', healthRouter);
   app.use('/api/auth', authRouter);
