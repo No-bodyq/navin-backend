@@ -20,5 +20,8 @@ const TelemetrySchema = new Schema(
   { timestamps: true },
 );
 
+TelemetrySchema.index({ shipmentId: 1, timestamp: -1 });
+TelemetrySchema.index({ timestamp: -1, _id: -1 });
+
 export const Telemetry = model('Telemetry', TelemetrySchema);
 

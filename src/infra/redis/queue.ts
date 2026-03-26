@@ -1,4 +1,4 @@
-import Redis from 'ioredis';
+import { Redis } from 'ioredis';
 import { config } from '../../config/index.js';
 
 let redisClient: Redis | null = null;

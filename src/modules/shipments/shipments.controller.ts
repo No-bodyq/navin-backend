@@ -4,7 +4,6 @@ import { UserModel } from '../users/users.model.js';
 import type { FilterQuery } from 'mongoose';
 import {
   findShipments,
-  countShipments,
   createShipmentService,
   patchShipmentService,
   updateShipmentStatusService,
@@ -12,20 +11,17 @@ import {
 } from './shipments.service.js';
 
 export const getShipments = async (req: Request, res: Response) => {
-  const { status, page = 1, limit = 10, ...filters } = req.query;
+  const { status, cursor, limit = 20, ...filters } = req.query;
   const query: FilterQuery<unknown> = { ...filters };
   if (status) query.status = status;
+  if (cursor) query._id = { $lt: cursor };
 
-  const skip = (Number(page) - 1) * Number(limit);
-  const shipments = await findShipments(query, skip, Number(limit));
-  const total = await countShipments(query);
+  const shipments = await findShipments(query, Number(limit));
+  const hasMore = shipments.length > Number(limit);
+  const data = hasMore ? shipments.slice(0, Number(limit)) : shipments;
+  const nextCursor = hasMore && data.length > 0 ? data[data.length - 1]._id.toString() : null;
 
-  res.json({
-    data: shipments,
-    page: Number(page),
-    limit: Number(limit),
-    total,
-  });
+  res.json({ data, nextCursor, hasMore });
 };
 
 export const createShipment = async (req: Request, res: Response) => {
