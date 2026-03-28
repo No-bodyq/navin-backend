@@ -3,7 +3,16 @@ import request from 'supertest';
 import express from 'express';
 import { AppError } from '../src/shared/http/errors.js';
 
-const mockValidateApiKey = jest.fn();
+type ValidateApiKeyResult = {
+  isValid: boolean;
+  apiKeyDoc?: {
+    _id: string;
+    organizationId: string;
+    shipmentId?: string;
+  };
+};
+
+const mockValidateApiKey = jest.fn<(_rawApiKey: string) => Promise<ValidateApiKeyResult>>();
 
 describe('requireApiKey middleware', () => {
   let app: express.Application;
